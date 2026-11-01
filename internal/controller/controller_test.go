@@ -13,8 +13,8 @@ func testConfig() common.TestConfig {
 	return common.TestConfig{
 		SMTPHost: "default.relay", SMTPPort: 587,
 		SMTPUser: "u", SMTPPass: "p",
-		FromDomain: "loadtest.example",
-		Recipients: []string{"sink@loadtest.example"},
+		FromDomain:             "loadtest.example",
+		Recipients:             []string{"sink@loadtest.example"},
 		TargetRatePerGenerator: 10, DurationSeconds: 5,
 		PayloadBytes: 1024, Profile: common.ProfilePersistent,
 		Connections: 2, TLSVerify: false, MaxDurationSecs: 10,
