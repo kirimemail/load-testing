@@ -25,8 +25,9 @@ func main() {
 			return
 		}
 		var req struct {
-			Name   string             `json:"name"`
-			Config common.TestConfig `json:"config"`
+			Name       string            `json:"name"`
+			Config     common.TestConfig `json:"config"`
+			RelayHosts []string          `json:"relay_hosts"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "bad request: "+err.Error(), http.StatusBadRequest)
@@ -35,7 +36,7 @@ func main() {
 		if req.Name == "" {
 			req.Name = "adhoc"
 		}
-		if err := ctl.StartTest(req.Name, req.Config); err != nil {
+		if err := ctl.StartTest(req.Name, req.Config, req.RelayHosts); err != nil {
 			// 502 with per-generator detail so failures are never hidden.
 			http.Error(w, "start failed: "+err.Error(), http.StatusBadGateway)
 			return

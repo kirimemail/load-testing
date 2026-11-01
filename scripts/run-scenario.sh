@@ -1,6 +1,4 @@
 #!/bin/sh
-# Usage: ./scripts/run-scenario.sh scenarios/scenario-b.yaml http://controller:8081
-set -eu
-echo "scenario files are applied via the controller API; example:"
-echo "  curl -X POST $2/api/tests/start -H 'Content-Type: application/json' -d @- < rendered.json"
-echo "Render the YAML scenario into the API payload with your relay hosts/creds first."
+# Thin wrapper -- prefer calling run-scenario.py directly for full options:
+#   python3 scripts/run-scenario.py scenarios/scenario-b.yaml --env-file .env --dry-run
+exec python3 "$(dirname "$0")/run-scenario.py" "$@"

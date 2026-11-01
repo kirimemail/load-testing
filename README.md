@@ -86,6 +86,44 @@ Rules that apply in both modes:
 Practical path: validate single-host with Scenario A first, then roll
 the same image out to the 4 load hosts for B–E.
 
+## Running a test: credentials + scenarios
+
+Yes — you supply both. Nothing ships with real credentials or a live target.
+
+**1. Credentials and relay hosts** (protected `.env`, never committed):
+
+```sh
+cp .env.example .env   # then fill in TEST-relay values
+```
+
+| Variable | Meaning |
+| --- | --- |
+| `RELAY_HOSTS` | one relay per generator, in order (`gen-1` → first entry); length must match `generators:` |
+| `SMTP_HOST/PORT/USER/PASS` | fallback relay + SMTP AUTH for the TEST relays |
+| `FROM_DOMAIN`, `RECIPIENTS` | dedicated test domain + controlled sink recipients (never real addresses) |
+| `CONTROLLER_URL` | controller management endpoint (private net only) |
+
+Precedence: scenario file < `.env` < environment. Passwords travel only to
+generators over the private management network and are never logged
+(`--dry-run` prints them as `***`).
+
+**2. Scenarios** (`scenarios/*.yaml`, A–E) are starting points — copy and
+edit, e.g. `cp scenarios/scenario-b.yaml scenarios/my-run.yaml`, then:
+
+```sh
+python3 scripts/run-scenario.py scenarios/my-run.yaml --env-file .env --dry-run  # inspect
+python3 scripts/run-scenario.py scenarios/my-run.yaml --env-file .env --wait     # run + report
+```
+
+Useful flags: `--step-index N` (run one `payload_steps`/`connection_steps`
+entry for sweeps D/E), `--controller URL`, `--allow-live-domain` (escapes the
+test-domain safety guard — you own the consequences).
+
+The controller API accepts the same thing directly:
+`POST /api/tests/start` with `{"name","config","relay_hosts"}` — generator
+*i* is configured with `relay_hosts[i]` (the 1:1 pairing); when omitted, all
+generators share `config.smtp_host`.
+
 ## Generator API (`:8080`, private mgmt net only)
 
 `POST /configure`, `POST /start`, `POST /stop`, `POST /emergency-stop`,

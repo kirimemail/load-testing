@@ -114,15 +114,36 @@ func (e *Engine) Start() error {
 }
 
 // Stop requests graceful shutdown; EmergencyStop aborts immediately.
-func (e *Engine) Stop()  { e.mu.Lock(); c := e.cancel; e.mu.Unlock(); if c != nil { c.cancel() } }
-func (e *Engine) Panic() { e.mu.Lock(); e.state = "emergency"; c := e.cancel; e.mu.Unlock(); if c != nil { c.cancel() } }
+func (e *Engine) Stop() {
+	e.mu.Lock()
+	c := e.cancel
+	e.mu.Unlock()
+	if c != nil {
+		c.cancel()
+	}
+}
+func (e *Engine) Panic() {
+	e.mu.Lock()
+	e.state = "emergency"
+	c := e.cancel
+	e.mu.Unlock()
+	if c != nil {
+		c.cancel()
+	}
+}
 
 func (e *Engine) State() string { e.mu.Lock(); defer e.mu.Unlock(); return e.state }
 
 // run is the main loop: global ticker -> job queue -> workers -> stats.
 func (e *Engine) run(cfg common.TestConfig, cancel *context_Cancel, done chan struct{}) {
 	defer close(done)
-	defer func() { e.mu.Lock(); if e.state == "running" { e.state = "stopped" }; e.mu.Unlock() }()
+	defer func() {
+		e.mu.Lock()
+		if e.state == "running" {
+			e.state = "stopped"
+		}
+		e.mu.Unlock()
+	}()
 
 	deadline := time.Now().Add(time.Duration(cfg.DurationSeconds) * time.Second)
 	if cfg.MaxDurationSecs > 0 {
@@ -345,21 +366,21 @@ func (e *Engine) Status() map[string]any {
 	state := e.state
 	e.mu.Unlock()
 	return map[string]any{
-		"generator_id":          e.id,
-		"state":                 state,
-		"attempted":             atomic.LoadUint64(&e.nAttempted),
-		"accepted":              atomic.LoadUint64(&e.nAccepted),
-		"failed":                atomic.LoadUint64(&e.nFailed),
-		"dropped":               atomic.LoadUint64(&e.nDropped),
-		"connections_active":    atomic.LoadInt64(&e.nActive),
-		"connections_total":     atomic.LoadUint64(&e.nConnTotal),
-		"tls_handshakes_total":  atomic.LoadUint64(&e.nTLS),
-		"auth_failures_total":   atomic.LoadUint64(&e.nAuthFail),
-		"actual_rate_msg_sec":   e.rateValue(),
-		"latency_p50_ms":        p50,
-		"latency_p95_ms":        p95,
-		"latency_p99_ms":        p99,
-		"elapsed_seconds":       elapsed,
+		"generator_id":         e.id,
+		"state":                state,
+		"attempted":            atomic.LoadUint64(&e.nAttempted),
+		"accepted":             atomic.LoadUint64(&e.nAccepted),
+		"failed":               atomic.LoadUint64(&e.nFailed),
+		"dropped":              atomic.LoadUint64(&e.nDropped),
+		"connections_active":   atomic.LoadInt64(&e.nActive),
+		"connections_total":    atomic.LoadUint64(&e.nConnTotal),
+		"tls_handshakes_total": atomic.LoadUint64(&e.nTLS),
+		"auth_failures_total":  atomic.LoadUint64(&e.nAuthFail),
+		"actual_rate_msg_sec":  e.rateValue(),
+		"latency_p50_ms":       p50,
+		"latency_p95_ms":       p95,
+		"latency_p99_ms":       p99,
+		"elapsed_seconds":      elapsed,
 	}
 }
 

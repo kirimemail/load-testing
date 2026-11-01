@@ -106,20 +106,20 @@ type GeneratorStatus struct {
 
 // AggregateReport is returned by the controller: end-to-end benchmark summary.
 type AggregateReport struct {
-	Scenario          string            `json:"scenario"`
-	Generators        int               `json:"generators"`
-	TargetTotalRate   int               `json:"target_total_msg_sec"`
-	Attempted         uint64            `json:"attempted_total"`
-	Accepted          uint64            `json:"accepted_total"`
-	Failed            uint64            `json:"failed_total"`
-	Dropped           uint64            `json:"dropped_total"`
-	AcceptedRate      float64           `json:"accepted_msg_sec"`
-	AttemptedRate     float64           `json:"attempted_msg_sec"`
-	LatencyP50Ms      float64           `json:"latency_p50_ms"`
-	LatencyP95Ms      float64           `json:"latency_p95_ms"`
-	LatencyP99Ms      float64           `json:"latency_p99_ms"`
-	ElapsedSecs       float64           `json:"elapsed_seconds"`
-	ExpectedMessages  uint64            `json:"expected_messages"`
-	NetworkNote       string            `json:"network_note"`
-	PerGenerator      []GeneratorStatus `json:"per_generator"`
+	Scenario         string            `json:"scenario"`
+	Generators       int               `json:"generators"`
+	TargetTotalRate  int               `json:"target_total_msg_sec"`
+	Attempted        uint64            `json:"attempted_total"`
+	Accepted         uint64            `json:"accepted_total"`
+	Failed           uint64            `json:"failed_total"`
+	Dropped          uint64            `json:"dropped_total"`
+	AcceptedRate     float64           `json:"accepted_msg_sec"`
+	AttemptedRate    float64           `json:"attempted_msg_sec"`
+	LatencyP50Ms     float64           `json:"latency_p50_ms"`
+	LatencyP95Ms     float64           `json:"latency_p95_ms"`
+	LatencyP99Ms     float64           `json:"latency_p99_ms"`
+	ElapsedSecs      float64           `json:"elapsed_seconds"`
+	ExpectedMessages uint64            `json:"expected_messages"`
+	NetworkNote      string            `json:"network_note"`
+	PerGenerator     []GeneratorStatus `json:"per_generator"`
 }

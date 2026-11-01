@@ -27,9 +27,9 @@ type Controller struct {
 }
 
 type ActiveTest struct {
-	Name      string             `json:"name"`
-	Config    common.TestConfig  `json:"config"`
-	StartedAt time.Time          `json:"started_at"`
+	Name      string            `json:"name"`
+	Config    common.TestConfig `json:"config"`
+	StartedAt time.Time         `json:"started_at"`
 }
 
 func New(generators []string) *Controller {
@@ -37,11 +37,17 @@ func New(generators []string) *Controller {
 }
 
 func (c *Controller) SetGenerators(urls []string) { c.mu.Lock(); c.generators = urls; c.mu.Unlock() }
-func (c *Controller) Generators() []string        { c.mu.Lock(); defer c.mu.Unlock(); return append([]string(nil), c.generators...) }
+func (c *Controller) Generators() []string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return append([]string(nil), c.generators...)
+}
 
 // StartTest validates once, then configures + starts every generator in
 // parallel. A per-generator failure is reported, never hidden.
-func (c *Controller) StartTest(name string, cfg common.TestConfig) error {
+// relayHosts optionally maps generator i to relay i (1:1 pairing); empty
+// means every generator uses cfg.SMTPHost.
+func (c *Controller) StartTest(name string, cfg common.TestConfig, relayHosts []string) error {
 	if err := cfg.Validate(); err != nil {
 		return err
 	}
@@ -49,17 +55,28 @@ func (c *Controller) StartTest(name string, cfg common.TestConfig) error {
 	if len(gens) == 0 {
 		return fmt.Errorf("no generators registered")
 	}
+	if len(relayHosts) > 0 && len(relayHosts) != len(gens) {
+		return fmt.Errorf("relay_hosts has %d entries but %d generators are registered", len(relayHosts), len(gens))
+	}
 	type res struct {
 		gen string
 		err error
 	}
 	results := make(chan res, len(gens))
 	var wg sync.WaitGroup
-	for _, g := range gens {
+	for i, g := range gens {
 		wg.Add(1)
-		go func(base string) {
+		go func(idx int, base string) {
 			defer wg.Done()
-			if err := c.postJSON(base+"/configure", cfg); err != nil {
+			genCfg := cfg
+			if len(relayHosts) > 0 {
+				genCfg.SMTPHost = relayHosts[idx]
+			}
+			if err := genCfg.Validate(); err != nil {
+				results <- res{base, fmt.Errorf("generator %d config: %w", idx+1, err)}
+				return
+			}
+			if err := c.postJSON(base+"/configure", genCfg); err != nil {
 				results <- res{base, fmt.Errorf("configure: %w", err)}
 				return
 			}
@@ -68,7 +85,7 @@ func (c *Controller) StartTest(name string, cfg common.TestConfig) error {
 				return
 			}
 			results <- res{base, nil}
-		}(g)
+		}(i, g)
 	}
 	wg.Wait()
 	close(results)
@@ -88,7 +105,7 @@ func (c *Controller) StartTest(name string, cfg common.TestConfig) error {
 }
 
 // StopTest fans out graceful stop; EmergencyStop aborts immediately.
-func (c *Controller) StopTest() map[string]string     { return c.fanout("/stop") }
+func (c *Controller) StopTest() map[string]string      { return c.fanout("/stop") }
 func (c *Controller) EmergencyStop() map[string]string { return c.fanout("/emergency-stop") }
 
 func (c *Controller) fanout(path string) map[string]string {
@@ -208,10 +225,10 @@ func (c *Controller) Report() common.AggregateReport {
 		AcceptedRate:  accRate,
 		AttemptedRate: attRate,
 		LatencyP50Ms:  p50, LatencyP95Ms: p95, LatencyP99Ms: p99,
-		ElapsedSecs:     elapsed,
+		ElapsedSecs:      elapsed,
 		ExpectedMessages: expected,
-		NetworkNote: "Compare accepted_msg_sec against relay CPU/net + generator interface utilization to distinguish network saturation from Haraka saturation. See docs/network-triage.md.",
-		PerGenerator: statuses,
+		NetworkNote:      "Compare accepted_msg_sec against relay CPU/net + generator interface utilization to distinguish network saturation from Haraka saturation. See docs/network-triage.md.",
+		PerGenerator:     statuses,
 	}
 }
 
