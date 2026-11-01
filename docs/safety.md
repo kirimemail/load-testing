@@ -10,4 +10,4 @@
   that inflates throughput.
 - Credentials: Docker secrets or protected `.env` (see `.env.example`);
   never committed, never logged.
-- Clean Haraka queues after each run before comparing scenarios.
+- Clean relay queues after each run before comparing scenarios.

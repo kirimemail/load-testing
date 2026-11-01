@@ -16,13 +16,13 @@ scrape_configs:
     static_configs:
       - targets:
           - controller:8081
-  # Haraka hosts expose node_exporter + haraka exporter here.
+  # Relay hosts expose node_exporter here.
   - job_name: relays
     static_configs:
       - targets:
-          - haraka-1:9100
-          - haraka-2:9100
-          - haraka-3:9100
-          - haraka-4:9100
+          - relay-1:9100
+          - relay-2:9100
+          - relay-3:9100
+          - relay-4:9100
         labels:
           tier: relay

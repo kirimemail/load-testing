@@ -14,7 +14,7 @@ const (
 // TestConfig is the unit of work assigned to ONE generator.
 // Aggregate targets are obtained by multiplying by the generator count.
 type TestConfig struct {
-	// SMTP target (the Haraka relay paired with this generator).
+	// SMTP target (the relay paired with this generator).
 	SMTPHost string `json:"smtp_host" yaml:"smtp_host"`
 	SMTPPort int    `json:"smtp_port" yaml:"smtp_port"`
 

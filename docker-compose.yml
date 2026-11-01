@@ -1,5 +1,5 @@
 # Local / CI stack: controller + 1 generator + Prometheus + Grafana.
-# Production: 4x (generator -> Haraka relay) pairs on separate hosts.
+# Production: 4x (generator -> SMTP relay) pairs on separate hosts.
 # Management traffic (8080/8081/9090/3000) must stay off the SMTP network.
 name: smtp-loadtest
 services:

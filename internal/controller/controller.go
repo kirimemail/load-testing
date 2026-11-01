@@ -227,7 +227,7 @@ func (c *Controller) Report() common.AggregateReport {
 		LatencyP50Ms:  p50, LatencyP95Ms: p95, LatencyP99Ms: p99,
 		ElapsedSecs:      elapsed,
 		ExpectedMessages: expected,
-		NetworkNote:      "Compare accepted_msg_sec against relay CPU/net + generator interface utilization to distinguish network saturation from Haraka saturation. See docs/network-triage.md.",
+		NetworkNote:      "Compare accepted_msg_sec against relay CPU/net + generator interface utilization to distinguish network saturation from relay saturation. See docs/network-triage.md.",
 		PerGenerator:     statuses,
 	}
 }

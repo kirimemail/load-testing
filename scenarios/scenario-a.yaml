@@ -1,5 +1,5 @@
 ---
-# Scenario A — Individual relay baseline: 1 generator -> 1 Haraka relay.
+# Scenario A — Individual relay baseline: 1 generator -> 1 SMTP relay.
 name: scenario-a
 description: Baseline one relay at 500 msg/sec for 5 minutes, 10KB, persistent.
 generators: 1

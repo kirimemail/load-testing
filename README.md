@@ -1,4 +1,4 @@
-# Distributed SMTP Load Testing (Haraka)
+# Distributed SMTP Load Testing
 
 Fleet load tester targeting **2,000 accepted SMTP msg/sec** (4 x 500) over
 STARTTLS + SMTP AUTH, with persistent-connection and per-message-churn
@@ -40,16 +40,16 @@ Both work, for different purposes.
 
 `docker-compose.yml` runs controller + 1 generator + Prometheus + Grafana
 on one machine. Good for validating wiring and baselining one relay
-(Scenario A: 1 generator → 1 Haraka relay, 500 msg/sec). You can also run
+(Scenario A: 1 generator → 1 SMTP relay, 500 msg/sec). You can also run
 several generator containers on one box for a dry run — but one NIC, one
 kernel, and CPU contention will cap throughput, and the shared test network
-caps it further. A single-host number is **not** Haraka capacity (see
+caps it further. A single-host number is **not** relay capacity (see
 `docs/network-triage.md`).
 
 ### Multiple hosts (real benchmarks, Scenarios B–E)
 
 The brief requires 4 independent generators, preferably on separate
-servers, paired 1:1 with the 4 Haraka relays. Never run generators on
+servers, paired 1:1 with the 4 SMTP relays. Never run generators on
 the relay servers.
 
 1. Clone this repo on each of the 4 load hosts.
@@ -76,7 +76,7 @@ the relay servers.
 
 Rules that apply in both modes:
 
-- 1 generator → 1 relay pairing (gen-N sends only to haraka-N),
+- 1 generator → 1 relay pairing (gen-N sends only to relay-N),
   50 connections each in persistent mode.
 - Management ports (8080/8081/9090/3000) bind to localhost — reach
   them over the private mgmt network or an SSH tunnel, never publicly.
