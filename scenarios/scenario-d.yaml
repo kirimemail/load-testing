@@ -1,0 +1,22 @@
+---
+# Scenario D — Connection scaling at constant 2000 msg/sec.
+# Run once per step, varying connections: 25 / 50 / 100 / 200 per generator.
+name: scenario-d
+description: Sweep concurrency to find the optimal level.
+generators: 4
+smtp_port: 587
+target_rate_per_generator: 500
+duration_seconds: 600
+payload_bytes: 10240
+profile: persistent
+connections: 50
+tls_verify: true
+max_duration_secs: 660
+from_domain: loadtest.example
+connection_steps:
+  - 25
+  - 50
+  - 100
+  - 200
+recipients:
+  - sink-d1@loadtest.example

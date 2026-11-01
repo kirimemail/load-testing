@@ -1,0 +1,12 @@
+{
+  "title": "SMTP Load Test",
+  "panels": [
+    {"title": "Accepted msg/sec (per generator)", "targets": [{"expr": "sum by (generator) (rate(smtp_messages_accepted_total[1m]))"}]},
+    {"title": "Attempted vs accepted (fleet)", "targets": [{"expr": "sum(rate(smtp_messages_attempted_total[1m]))"}, {"expr": "sum(rate(smtp_messages_accepted_total[1m]))"}]},
+    {"title": "Failed + dropped", "targets": [{"expr": "sum(smtp_messages_failed_total)"}, {"expr": "sum(smtp_messages_dropped_total)"}]},
+    {"title": "Transaction latency", "targets": [{"expr": "histogram_quantile(0.50, sum(rate(smtp_transaction_duration_seconds_bucket[5m])))"}, {"expr": "histogram_quantile(0.95, sum(rate(smtp_transaction_duration_seconds_bucket[5m])))"}, {"expr": "histogram_quantile(0.99, sum(rate(smtp_transaction_duration_seconds_bucket[5m])))"}]},
+    {"title": "Active connections", "targets": [{"expr": "sum(smtp_connections_active)"}]},
+    {"title": "TLS handshakes", "targets": [{"expr": "sum(rate(smtp_tls_handshakes_total[1m]))"}]},
+    {"title": "Auth failures", "targets": [{"expr": "sum(smtp_auth_failures_total)"}]}
+  ]
+}

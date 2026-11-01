@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 10s
+scrape_configs:
+  - job_name: generators
+    static_configs:
+      - targets:
+          - gen-1:8080
+          - gen-2:8080
+          - gen-3:8080
+          - gen-4:8080
+        labels:
+          tier: load
+    metrics_path: /metrics
+  - job_name: controller
+    static_configs:
+      - targets:
+          - controller:8081
+  # Haraka hosts expose node_exporter + haraka exporter here.
+  - job_name: relays
+    static_configs:
+      - targets:
+          - haraka-1:9100
+          - haraka-2:9100
+          - haraka-3:9100
+          - haraka-4:9100
+        labels:
+          tier: relay

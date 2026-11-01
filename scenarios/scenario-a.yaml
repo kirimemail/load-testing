@@ -1,0 +1,17 @@
+---
+# Scenario A — Individual relay baseline: 1 generator -> 1 Haraka relay.
+name: scenario-a
+description: Baseline one relay at 500 msg/sec for 5 minutes, 10KB, persistent.
+generators: 1
+smtp_port: 587
+target_rate_per_generator: 500
+duration_seconds: 300
+payload_bytes: 10240
+profile: persistent
+connections: 50
+tls_verify: true
+max_duration_secs: 360
+from_domain: loadtest.example
+recipients:
+  - sink-a1@loadtest.example
+  - sink-a2@loadtest.example

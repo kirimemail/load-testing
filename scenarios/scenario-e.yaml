@@ -1,0 +1,20 @@
+---
+# Scenario E — Payload scaling: 5KB / 10KB / 20KB persistent runs.
+name: scenario-e
+description: Determine bandwidth sensitivity of the relay path.
+generators: 4
+smtp_port: 587
+target_rate_per_generator: 500
+duration_seconds: 600
+payload_bytes: 10240
+profile: persistent
+connections: 50
+tls_verify: true
+max_duration_secs: 660
+from_domain: loadtest.example
+payload_steps:
+  - 5120
+  - 10240
+  - 20480
+recipients:
+  - sink-e1@loadtest.example

@@ -1,0 +1,17 @@
+---
+# Scenario B — Distributed persistent load: 4 pairs, 2000 msg/sec, 30 min.
+name: scenario-b
+description: Full fleet persistent load, 3.6M messages expected.
+generators: 4
+smtp_port: 587
+target_rate_per_generator: 500
+duration_seconds: 1800
+payload_bytes: 10240
+profile: persistent
+connections: 50
+tls_verify: true
+max_duration_secs: 1860
+from_domain: loadtest.example
+recipients:
+  - sink-b1@loadtest.example
+  - sink-b2@loadtest.example

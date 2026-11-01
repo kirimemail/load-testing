@@ -1,0 +1,25 @@
+# Deploy ONE independent generator on each load host (4x total).
+# Usage (fill env from protected file, never commit secrets):
+#   docker compose -f docker-compose.remote-generator.yml up -d
+name: smtp-generator
+services:
+  generator:
+    build:
+      context: .
+      dockerfile: Dockerfile.generator
+    environment:
+      GENERATOR_ID: ${GENERATOR_ID:-gen-1}
+      MANAGEMENT_ADDR: ":8080"
+    ports:
+      # controller reaches this via private mgmt net; never public
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://127.0.0.1:8080/health
+      interval: 10s
+      timeout: 3s
+      retries: 3

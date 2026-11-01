@@ -1,0 +1,59 @@
+# Local / CI stack: controller + 1 generator + Prometheus + Grafana.
+# Production: 4x (generator -> Haraka relay) pairs on separate hosts.
+# Management traffic (8080/8081/9090/3000) must stay off the SMTP network.
+name: smtp-loadtest
+services:
+  controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.controller
+    environment:
+      MANAGEMENT_ADDR: ":8081"
+      GENERATORS: "http://gen-1:8080"
+    ports:
+      # never expose publicly
+      - "127.0.0.1:8081:8081"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://127.0.0.1:8081/health
+      interval: 15s
+      timeout: 3s
+      retries: 3
+  gen-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.generator
+    environment:
+      GENERATOR_ID: gen-1
+      MANAGEMENT_ADDR: ":8080"
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://127.0.0.1:8080/health
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  prometheus:
+    image: prom/prometheus:v3.0.0
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "127.0.0.1:9090:9090"
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:11.3.0
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped

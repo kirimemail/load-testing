@@ -1,0 +1,16 @@
+---
+# Scenario C — Connection churn: new TCP+TLS+AUTH per message.
+name: scenario-c
+description: Measure connection, TLS and authentication overhead.
+generators: 4
+smtp_port: 587
+target_rate_per_generator: 500
+duration_seconds: 1800
+payload_bytes: 10240
+profile: churn
+connections: 50
+tls_verify: true
+max_duration_secs: 1860
+from_domain: loadtest.example
+recipients:
+  - sink-c1@loadtest.example
